@@ -4,6 +4,8 @@ import type { PokemonListResponse } from '@interfaces/pokemon-list.response';
 
 import MainLayout from '@layouts/MainLayout.astro';
 import PokemonCard from '@components/PokemonCard.astro';
+import Title from '@components/shared/Title.astro';
+import { Icon } from 'astro-icon/components';
 
 export const getStaticPaths = (async() => {
 
@@ -30,9 +32,17 @@ const imgSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
   image={imgSrc}
 >
   <section class="mt-10 mx-10 flex flex-col justify-center items-center">
-    <div>
-      <a href="/">Regresar</a>
-      <h1 class="text-5xl capitalize">{name}</h1>
+    <div class="flex flex-row">
+      <div>
+        <!-- <a href="/">Regresar</a> -->
+         <button onclick="history.back()" class="text-blue-500">Regresar</button>
+        <Title>{name}</Title>
+      </div>
+  
+      <button id="btn-favorite" class="ml-4" data-name={name} data-id={id} >
+        <Icon name="heart-outline" size={50} />
+        <Icon class="hidden" name="heart-full" size={50} />
+      </button>
     </div>
 
     <PokemonCard
@@ -48,8 +58,31 @@ const imgSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
   </section>
 </MainLayout>
 
+<script>
+  interface FavoritePokemon {
+    name: string;
+    id: number;
+  }
+
+  const btnFavorite = document.querySelector(
+    '#btn-favorite'
+  ) as HTMLButtonElement;
+
+  const { id, name } = btnFavorite.dataset;
+
+  btnFavorite.addEventListener('click', () => {
+    console.log(id, name);
+  });
+
+
+</script>
+
 <style>
   a {
     @apply hover:underline text-blue-500;
+  }
+
+  #btn-favorite {
+    @apply hover:animate-pulse
   }
 </style>
