@@ -40,8 +40,8 @@ const imgSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
       </div>
   
       <button id="btn-favorite" class="ml-4" data-name={name} data-id={id} >
-        <Icon name="heart-outline" size={50} />
-        <Icon class="hidden" name="heart-full" size={50} />
+        <Icon data-outline name="heart-outline" size={50} />
+        <Icon data-full class="hidden" name="heart-full" size={50} />
       </button>
     </div>
 
@@ -64,17 +64,59 @@ const imgSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
     id: number;
   }
 
-  const btnFavorite = document.querySelector(
-    '#btn-favorite'
-  ) as HTMLButtonElement;
+  const handlePageLoad = () => {
+    let favoritePokemons: FavoritePokemon[] = JSON.parse(
+      localStorage.getItem('favorites') ?? '[]'
+    );
 
-  const { id, name } = btnFavorite.dataset;
+    const btnFavorite = document.querySelector(
+      '#btn-favorite'
+    ) as HTMLButtonElement | null;
+  
+    if(!btnFavorite) return;
+  
+    const { id, name } = btnFavorite.dataset;
 
-  btnFavorite.addEventListener('click', () => {
-    console.log(id, name);
-  });
+    const heartOutline = btnFavorite.querySelector(
+      '[data-outline]'
+    ) as HTMLElement;
 
+    const heartFull = btnFavorite.querySelector(
+      '[data-full]'
+    ) as HTMLElement;
 
+    const isFavorite = favoritePokemons.some((fav) => fav.name === name);
+
+    if(isFavorite) {
+      heartOutline.classList.add('hidden');
+      heartFull.classList.remove('hidden');
+    }
+
+    const toggleFavorite = () => {
+      const isFavorite = favoritePokemons.some((fav) => fav.name === name);
+
+      if(isFavorite) {
+        favoritePokemons.filter((fav) => fav.name !== name);
+      } else {
+        favoritePokemons.push({
+          id: id ? +id : 0,
+          name: name ?? ''
+        });
+      }
+
+      localStorage.setItem('favorites', JSON.stringify(favoritePokemons))
+    }
+  
+    btnFavorite.addEventListener('click', () => {
+      console.log(id, name);
+      heartOutline.classList.toggle('hidden');
+      heartFull.classList.toggle('hidden');
+
+      toggleFavorite();
+    });
+  }
+
+  document.addEventListener('astro:page-load', handlePageLoad);
 </script>
 
 <style>
